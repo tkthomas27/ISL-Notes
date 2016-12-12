@@ -1,0 +1,323 @@
+---
+title: "Introduction and Chp 2: Statistical Learning"
+output:
+  html_notebook:
+    toc: true
+    number_sections: true
+  pdf_document: default
+---
+
+# Introduction
+
+**Overview**
+
+- Supervised: prediction/estimation of outputs based on inputs
+- Unsupervised: inputs but no supervising outputs
+- Regression: continuous/discrete data
+- Classification: qualitative/categorical data
+- Clustering: no output; principal components
+
+**History**
+
+- Method of Least Squares; Linear Regression: Legendre and Gauss
+- Linear Discriminant Analysis: Fisher
+- Logistic Regression: alternative to LDA
+- Generalized Linear Models: Nelder and Wedderburn class of methods including linear and logistic
+- Classification and Regression Trees: Breiman, Friedman, Olshen, and Stone (including cross-validation)
+- Generalized Additive Models: Hastie and Tibshirani, class of non-linear extensions to GLM
+
+**Matrix Notation**
+
+- n is number of observations
+- p is number of variables
+- i is index of observations (i = 1, 2, ..., n)
+- j is index of variables (p = 1, 2, ..., p)
+- $\textbf{X}$ denotes $n \times p$ matrix whose $(i,j)$th element is $x_{i,j}$
+- vector of length n = **a**
+- vector of length of p or anything else = $x$
+- scalar = $a \in \mathbb{R} $
+- vector of length k = $a \in \mathbb{R}^k$
+- $(\textbf{AB})_{ij} = \sum_{k=1}^d a_{ik}b_{kj}$
+
+
+# Statistical Learning
+
+## What is Statistical Learning
+
+$Y = f(X) + \epsilon$
+
+* $f$ is systematic information that X provides about Y 
+* $\epsilon$ is error term --- independent of X and mean zero
+    
+### Prediction vs Inference
+
+* because error is zero on average, $\hat{Y} = \hat{f}(X)$
+* will always be some error because true Y is also a function of $\epsilon$ which by definition cannot be predicted by X
+    * $\epsilon$ may contain variables that are useful to predicting Y
+    * $\epsilon$ is upper bound on accuracy
+
+$$
+	\begin{equation}
+	\begin{split}
+		E[(Y - \hat{Y})^2] &= E[(f(X) + \epsilon - \hat{f}(X))^2]\\
+		&= \underset{Reducible}{[f(X) - \hat{f}(X)]^2} + \underset{Irreducible}{Var(\epsilon)}
+	\end{split}
+	\end{equation}
+$$
+
+* Prediction: X is easy to obtain by Y is not; use X to find Y
+    * $\hat{f}$ is a black box; interested just in reducing the reducible error
+* Understand how changes in X affect Y
+    * $\hat{f}$ is no longer a black box; need to know the form
+
+### Parametric vs Non-Parametric
+
+Want to find a function $\hat{f}$ such that $Y \approx \hat{f}(X) $ for any observation (X,Y)
+
+* Parametric models
+    * 1. Make assumption about functional form
+    * 2. Need procedure that uses data to fit/train model
+    * called parametric b/c it reduces problem of estimating $f$ down to just estimating a set of parameters
+    * often model chosen is not a perfect fit; but adding more parameters to smooth the fit will follow the errors and overfit
+
+* Non-parametric 
+    * does not make explicit assumptions about the form of $f$
+    * can accurately fit a wider range of possible shapes of $f$
+    * however, need a large number of obs for accurate estimation
+
+### Accuracy vs Interpretability
+
+* List descending Interpretability and Ascending Flexibility
+    * Subset Selection Lasso
+    * Least Squares
+    * Generalized Additive Models/Trees
+    * Bagging, Boosting
+    * Support Vector Machines
+    
+
+### Supervised vs Unsupervised Learning
+
+Supervised: fit model that relates response to predictors for purposes of predictors or inference
+
+Unsupervised: no associated y for vector of x
+* if there are p variables then there are $p(p-1)/2$ scatter plots possible
+
+### Regression vs Classification
+
+Classification used more for qualitative variables
+
+## Assessing Model Accuracy
+
+### Measuring Quality of Fit
+
+Need to quantify how close predicted value is to true response value; most common is mean squared error
+
+$$
+    MSE = \frac{1}{n} \sum_{i=1}^n (y_i - \hat{f}(x_i))^2
+$$
+
+* squared diff between observed and predicted Y
+* above equation is *training MSE* because it is from the training data; interested in MSE for unseen data; really interested in lowest *test MSE*
+* **degrees of freedom** summarizes flexibility of a curve
+* very low training MSE will often have high test MSE; can use cross-validation to help-control for this
+
+### Bias Variance Tradeoff
+
+Differences between low training MSE and high test MSE is function of bias-variance tradeoff; can decompose MSE into:
+
+$$
+    E[y_0 - \hat{f}(x_0)]^2 = Var[\hat{f}(x_0)] + [Bias(\hat{f}(x_0))]^2 + Var(\epsilon)
+$$
+
+* expected test MSE: $E[y_0 - \hat{f}(x_0)]^2$;  is what we would obtain if repeatedly estimated $f$
+* expected test MSE can never lie below $Var(\epsilon)$
+* Variance: how much $\hat{f}$ would change if estimated using different data
+    * overfitted model will change greatly if data is changed
+* Bias: error from model selection; more flexible leads to less bias
+* More flexible models: lower bias increased variance
+* Good test set performance of statistical learning method requires low variance and low squared bias
+
+<!-- some code to generate the bias, var MSE graph -->
+
+
+### Classification Setting
+
+Measure accuracy of classification using *error rate*: proportion of mistakes made when applying $\hat{f}$ to training data; *training error*: 
+
+$$
+    \frac{1}{n} \sum_{i=1}^n I(y_i \neq \hat{y}_i)
+$$
+
+* $I$ is an indicator equal to 1 if they are not the same ($\neq$) and 0 otherwise
+
+* corresponding *test error* is:
+$$
+    Ave(I(y_0 \neq \hat{y}_0))
+$$
+
+* a good classifier is one wher the test error is smallest
+
+**Bayes Classifier**
+
+On average minimum test error rate is given by classifier that assigns each obs to most likely class conditional on its predictor values --- This is the Bayes Classifier
+
+* simply assign a test observation with predictor vector $x_0$ to class $j$ for which $Pr(Y=j \vert X = x_0)$ is largest
+* Example:
+    * if two classes, Bayes classifier predicts class one if $Pr(Y = 1 | X = x_0) > 0.5$
+    * where probabilit is equalt to 50% is Bayes Decision Boundary
+* Bayes Error Rate: test error rate for classifiers
+* Bayes classifier produces smallest possible test error rate
+* Overall Bayes Error Rate is: $$1 - E[\max_{j} Pr(Y = j \vert X)] $$
+
+**K-Nearest Neighbor**
+
+Cannot compute Bayes Classifier for real data b/c we don't know the conditional distribution of Y given X; can estimate $Y \vert x$ and then classify obs based on highest *estimated* probability; one example is KNN:
+
+* With positive integer $K$ and test observation $x_0$, KNN identifies $K$ points in data closest to $x_0$; points represented by $N_0$
+* Then estimate conditional probability for class $j$ as fraction of points in $N_0$ whose response values equal $j$:
+
+$$
+    Pr(Y = j \vert X = x_0) = \frac{1}{K} \sum_{i \in N_0} I(y_i = j)
+$$
+
+*  Then applies Bayes rule and classifies test obs 
+
+<!-- example is great in the book; need code for simulation -->
+
+
+
+## Lab: Introduction to R
+
+```{r}
+# Chapter 2 Lab: Introduction to R
+
+# Load ISLR library for data
+library(ISLR)
+
+# Basic Commands
+
+x <- c(1,3,2,5)
+x
+x = c(1,6,2)
+x
+y = c(1,4,3)
+length(x)
+length(y)
+x+y
+ls()
+rm(x,y)
+ls()
+rm(list=ls())
+?matrix
+x=matrix(data=c(1,2,3,4), nrow=2, ncol=2)
+x
+x=matrix(c(1,2,3,4),2,2)
+matrix(c(1,2,3,4),2,2,byrow=TRUE)
+sqrt(x)
+x^2
+x=rnorm(50)
+y=x+rnorm(50,mean=50,sd=.1)
+cor(x,y)
+set.seed(1303)
+rnorm(50)
+set.seed(3)
+y=rnorm(100)
+mean(y)
+var(y)
+sqrt(var(y))
+sd(y)
+
+# Graphics
+
+x=rnorm(100)
+y=rnorm(100)
+plot(x,y)
+plot(x,y,xlab="this is the x-axis",ylab="this is the y-axis",main="Plot of X vs Y")
+pdf("Figure.pdf")
+plot(x,y,col="green")
+dev.off()
+x=seq(1,10)
+x
+x=1:10
+x
+x=seq(-pi,pi,length=50)
+y=x
+f=outer(x,y,function(x,y)cos(y)/(1+x^2))
+contour(x,y,f)
+contour(x,y,f,nlevels=45,add=T)
+fa=(f-t(f))/2
+contour(x,y,fa,nlevels=15)
+image(x,y,fa)
+persp(x,y,fa)
+persp(x,y,fa,theta=30)
+persp(x,y,fa,theta=30,phi=20)
+persp(x,y,fa,theta=30,phi=70)
+persp(x,y,fa,theta=30,phi=40)
+
+# Indexing Data
+
+A=matrix(1:16,4,4)
+A
+A[2,3]
+A[c(1,3),c(2,4)]
+A[1:3,2:4]
+A[1:2,]
+A[,1:2]
+A[1,]
+A[-c(1,3),]
+A[-c(1,3),-c(1,3,4)]
+dim(A)
+
+# Loading Data
+
+Auto = Auto
+dim(Auto)
+Auto[1:4,]
+Auto=na.omit(Auto)
+dim(Auto)
+names(Auto)
+
+# Additional Graphical and Numerical Summaries
+attach(Auto)
+plot(cylinders, mpg)
+cylinders=as.factor(cylinders)
+plot(cylinders, mpg)
+plot(cylinders, mpg, col="red")
+plot(cylinders, mpg, col="red", varwidth=T)
+plot(cylinders, mpg, col="red", varwidth=T,horizontal=T)
+plot(cylinders, mpg, col="red", varwidth=T, xlab="cylinders", ylab="MPG")
+hist(mpg)
+hist(mpg,col=2)
+hist(mpg,col=2,breaks=15)
+pairs(Auto)
+pairs(~ mpg + displacement + horsepower + weight + acceleration, Auto)
+plot(horsepower,mpg)
+identify(horsepower,mpg,name)
+summary(Auto)
+summary(mpg)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
