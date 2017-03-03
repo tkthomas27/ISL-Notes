@@ -1,0 +1,197 @@
+---
+title: 'Chapter 3: Linear Regression'
+pdf_document: default
+output:
+  html_notebook:
+    pandoc_args:
+    - --number-sections
+    - --number-offset=2
+    toc: yes
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+\setcounter{section}{3}
+
+
+# Linear Regression
+
+**Questions**
+
+- Is there a relationship bewtween Y and X?
+- How strong is the relationship between Y and X?
+- Which variable in X is related to Y?
+- How accurate is estimated effect?
+- How accurate are predictions?
+- Is the relatinoship linear?
+- Are their interactions between the X variables (synergy)?
+
+## Simple Linear Regression
+
+Basic equation for regressing Y on X is:
+
+$$
+Y \approx \beta_0 + \beta_1 X
+$$
+
+Once we have estimates of parameters $\beta_0$ and $\beta_1$, they can be used to estimate:
+
+$$
+\hat{y} = \hat{\beta}_0 + \hat{\beta}_1 x
+$$
+
+### Estimating the Coefficients
+
+The goal is to find a set of parameters that brings the line as close as possible to the data. Most common way is to minimize the least squares criterion.
+
+Regression boils down to a battle between $y$s --- the predicted and the actual $y$. In a single variable linear regression, we can plot the predicted value $\hat{y}$ against the single $x$ variable (this should form a line). If we put this line over a graph of the actual values of $y$ agains the single $x$, then we can measure difference between the actual values of $y$ and the predicted values of $y$ (i.e., $\hat{y}$). This difference is the *residual*: $e_i = y_i - \hat{y}_i$.
+
+We use this residual to calculate the residual sum of squares (RSS):
+
+$$
+\begin{split}
+RSS &= \sum e_i^2\\
+RSS &= \sum (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i)^2
+\end{split}
+$$
+
+**The Importance of RSS**: to estimate the $\beta$s we want to minimize the RSS. Remember: RSS is a measure of the distance between our prediction of $\hat{y}$ and what $y$ actually is. Therefore, it makes sense that we want to make this difference as small as possible (i.e., minimize the difference). This is done via calculus (see appendix) but in a single variable situation it can be show that the minimum for each $\beta$ is:
+
+$$
+\begin{split}
+\hat{\beta}_1 &= \frac{\sum^n_{i=1} (x_i - \bar{x})(y_i - \bar{y})}{\sum^n_{i=1} (x_i - \bar{x})^2}\\
+\hat{\beta}_1 &= \bar{y} - \hat{\beta}_1 \bar{x}
+\end{split}
+$$
+
+The bars over $y$ and $x$ (read as y-bar and x-bar) represent the mean (i.e., $\bar{y} \equiv \frac{1}{n} \sum y_i$)
+
+
+<!--- add contour and 3 dimensional plot  --->
+
+<!--  -->
+
+### Assessing the Accuracy of the Coefficient Estimates
+
+The true relationship between Y and X is $Y = f(X) + \epsilon$. The approximation of $f$ as a linear function is $Y = \beta_0 + \beta_1 X + \epsilon$.
+
+* $\beta_0$ is expected value of Y when X = 0
+* $\beta_1$ is average increase in Y associated with one unit increase in X
+* $\epsilon$ is catch-all for what is missed by model
+    * model misspecification (e.g., the relationship is non-linear)
+    * omitted variable bias
+    * errors in measurement
+
+    <!-- y = 2 + 3x + e simulation -->
+
+
+Sample mean is unbiased estimate of population because on average many sample means will equal the population mean.
+
+The accuracy of any estimate can be assessed from the standard error.
+
+$$
+Var(\hat{\mu}) = SE(\hat{\mu})^2 = \frac{\sigma^2}{n}
+$$
+
+$\sigma$ is standard deviations of each realization of $y_i$ of Y. As $n$ increases, deviations get smaller.
+
+Standard Errors of Betas
+
+$$
+SE({\hat{\beta}}_0)^2 = \sigma^2 \left[ \frac{1}{n} + \frac{\bar{x}^2}{\sum (x_i - \bar{x})^2} \right]
+$$
+
+$$
+SE({\hat{\beta}}_1)^2 = \frac{\sigma^2}{\sum (x_i - \bar{x})^2}
+$$
+
+$\sigma^2 = Var(\epsilon)$ but, under strict validity, errors for each observation need to be unrelated to common variance $\sigma^2$. $SE({\hat{\beta}}_1)$ is smaller when x is more spread out (more leverage to estimate slope when x is more spread out.)
+
+We do not know $\sigma^2$ in practice, but can estimate $\sigma$ with residual standard error = $\sqrt{ RSS/(n-2)}$
+
+<!-- need better explanation of standard error -->
+
+Can use SE to determine confidence interval:
+
+$$
+\hat{\beta}_1 \pm 1.95 \times SE(\hat{\beta}_1)
+$$
+
+Can also use SE to perform hypothesis testing. Most common hypothesis is if $\beta_1 = 0$ (i.e., there is a relationship Y and X). To assess difference from zero, use t stat which measures number of standard deviations from $\hat{\beta}_1$ from 0.
+
+$$
+t = \frac{\hat{\beta}_1 - 0}{SE(\hat{\beta}_1)}
+$$
+
+This allows for computation of the p-value --- a probability, using the t-distribution, of observing any value equal to $\vert t \vert$ or larger assuming $\beta_1 = 0$. A small p-value indicates that it is unlikely to observe such a substantial association between the predictor and the response due to chance in the absence of any real association between predictor and the response.
+
+<!-- reject the null -->
+
+<!-- need better info on hypothesis testing; p value; -->
+
+
+
+### Assessing Accuracy of the Model
+
+Residual Standard Error: average amount that response will deviate from the *true* regression line. It is a measure of the lack of fit.
+
+$$
+RSE = \sqrt{\frac{1}{n-2}RSS} = \sqrt{\frac{1}{n-2}\sum_{i=1}^n(y_i - \hat{y}_i)^2}
+$$
+
+RSE is an absolute measure of the lack of fit and is in the units of Y. As such, it is impossible to generalize specific units, we need a measure less dependent on the data. For that we use $R^2$ which is the proportion of the variability in Y that can be explained using X
+
+$$
+R^2 = \frac{TSS - RSS}{TSS} = 1 - \frac{RSS}{TSS}
+$$
+
+
+
+## Multiple Linear Regression
+
+The major difficulty with multiple linear regression is interpretation of the coefficients. The standard interpretation is: "$\beta_j$ is the average effect on Y of a one unit increase in $X_j$ holding all other predictors fixed."
+
+### Estimating Regression Coefficients
+
+The coefficients are estimated in the same way: minimize RSS. We can expand the single variable version to a multiple variable version:
+
+$$
+\begin{split}
+RSS &= \sum e_i^2\\
+RSS &= \sum (y_i - \hat{\beta}_0 - \hat{\beta}_1 x_i - ... -\hat{\beta}_p x_{ip})^2
+\end{split}
+$$
+
+The shark attacks and ice cream example given in the book is a good example of ommitted variable bias.
+
+**Relationship between Response and Predictors**
+
+$$
+F = \frac{\frac{(TSS-RSS)}{p}}{\frac{RSS}{(n-p-1)}}
+$$
+
+**Deciding on Important Variables**
+
+**Model Fit**
+
+**Predictions**
+
+## Other Considerations in Regression Model
+
+### Qualitative Predictors
+
+### Extensions of Linear Model
+
+### Potential Problems
+
+1. Non-linearity of response-predictor relationship
+2. Correlation of error terms
+3. Non-constant variance of error terms
+4. Outliers
+5. High-leverage points
+6. Collinearity
+
+## Comparison to KNN
+
+## Calculus Appendix
