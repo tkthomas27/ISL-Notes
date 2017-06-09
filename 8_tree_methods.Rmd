@@ -1,14 +1,51 @@
 ---
-title: "Tree Based Models"
-output:
-    html_notebook:
-    toc: true
-number_sections: true
+title: 'Chapter 3: Tree-Based Methods'
 pdf_document: default
+output:
+  html_notebook:
+    pandoc_args:
+    - --number-sections
+    - --number-offset=8
+    toc: yes
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
 ---
+\setcounter{section}{8}
+
+##Basics of Decision Trees
+
+* Stratifying/segmenting predictor space into simple regions
+* Useful and easy to interpret but not as powerful
+* bagging, random forests, and boosting help
+* Can be used for regression and classification
+
+###Regression Trees
 
 
 
+
+\subsubsection{Classification Trees}
+
+\subsubsection{Tree Versus Linear Models}
+
+\subsubsection{Advantages and Disadvantages of Trees}
+
+
+\subsection{Bagging, Random Forests, Boosting}
+
+\subsection{Bagging}
+
+Bootstrap aggregating (bagging) is a general purpose tool for reducing variance of statistical methods; frequently used with decision trees
+
+\subsection{Random Forests}
+
+decorrelates the tree
+
+a change to look at git hub app
+
+\subsection{Boosting}
 
 
 
