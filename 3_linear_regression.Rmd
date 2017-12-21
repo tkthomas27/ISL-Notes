@@ -15,6 +15,10 @@ output:
 \setcounter{section}{3}
 
 
+  <!-- rmarkdown::html_document: -->
+  <!--   theme: lumen -->
+
+
 # Linear Regression
 
 **Questions**
@@ -195,3 +199,120 @@ $$
 ## Comparison to KNN
 
 ## Calculus Appendix
+
+## Lab
+
+```{r}
+#load library
+library(MASS)
+library(ISLR)
+```
+
+```{r}
+#look at the data
+summary(Boston) 
+
+#library(stargazer)
+#stargazer(bos,type = 'html')
+
+```
+
+```{r results='asis'}
+library(summarytools)
+dfSummary(Boston, style="rmarkdown", plain.ascii=FALSE, missing="---")
+```
+
+```{r results='asis'}
+library(desctable)
+
+boston_summary <- Boston %>%
+    desctable(stats = list("N" = length, 
+                           "Mean" = mean, 
+                           "SD" = sd)) 
+datatable(boston_summary)
+```
+
+```{r}
+library(GGally)
+ggpairs(data=Boston, columns=c(1:5))
+#need to convert chas to binary
+```
+
+```{r}
+library(corrplot) #for correlations plot
+# get spearman correlations
+scor <- cor(Boston[,1:10],method="spearman")
+scor
+
+# visualize
+corrplot.mixed(scor)
+
+# get pearson correlations
+pcor <- cor(Boston[,1:10],method="pearson")
+pcor
+
+# visualize
+corrplot.mixed(pcor)
+```
+
+```{r}
+lm.fit=lm(medv ~ lstat, data = Boston)
+summary(lm.fit)
+names(lm.fit)
+confint(lm.fit)
+```
+
+Confidence vs Prediciton Intervals
+
+```{r}
+predict(lm.fit, data.frame(lstat = c(5, 10, 15)), interval = "confidence")
+predict(lm.fit, data.frame(lstat = c(5, 10, 15)), interval = "prediction")
+```
+
+maybe below is fix for gdp time series issues
+```{r}
+plot(Boston$lstat, Boston$medv) + abline(lm.fit)
+```
+
+```{r}
+plot(predict(lm.fit), residuals(lm.fit))
+plot(predict(lm.fit), rstudent(lm.fit))
+plot(hatvalues(lm.fit))
+```
+
+more diagnostics for above?
+
+```{r}
+lm.fit = lm(medv ~ lstat + age, data = Boston)
+summary(lm.fit)
+
+lm.fit = lm(medv ~ ., data = Boston)
+summary(lm.fit)
+
+#vif is part of car package
+```
+
+```{r}
+summary(lm(medv ~ lstat*age, data = Boston))
+```
+
+```{r}
+summary(lm(medv ~ lstat + I(lstat^2), data = Boston))
+```
+
+```{r}
+lm.fit = lm(medv ~ lstat, data = Boston)
+lm.fit2 = lm(medv ~ lstat + I(lstat^2), data = Boston)
+anova(lm.fit,lm.fit2)
+```
+
+```{r}
+summary(lm(medv ~ poly(lstat, 5), data = Boston))
+```
+
+```{r}
+names(Carseats)
+summary(lm(Sales ~ . + Income:Advertising + Price:Age, data = Carseats))
+contrasts(Carseats$ShelveLoc)
+```
+
