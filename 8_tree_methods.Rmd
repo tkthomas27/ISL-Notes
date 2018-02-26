@@ -1,5 +1,5 @@
 ---
-title: 'Chapter 3: Tree-Based Methods'
+title: 'Chapter 8: Tree-Based Methods'
 pdf_document: default
 output:
   html_notebook:
@@ -14,14 +14,14 @@ output:
 ---
 \setcounter{section}{8}
 
-##Basics of Decision Trees
+## Basics of Decision Trees
 
 * Stratifying/segmenting predictor space into simple regions
 * Useful and easy to interpret but not as powerful
 * bagging, random forests, and boosting help
 * Can be used for regression and classification
 
-###Regression Trees
+### Regression Trees
 
 
 
