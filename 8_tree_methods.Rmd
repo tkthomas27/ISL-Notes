@@ -12,6 +12,7 @@ output:
   pdf_document:
     toc: yes
 ---
+
 \setcounter{section}{8}
 
 ## Basics of Decision Trees

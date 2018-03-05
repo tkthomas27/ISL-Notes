@@ -1,0 +1,48 @@
+---
+title: 'Chapter 6: Linear Model Selection and Regularization'
+pdf_document: default
+output:
+  html_notebook:
+    pandoc_args:
+    - --number-sections
+    - --number-offset=6
+    toc: yes
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+# Lab
+
+Best Subset Selection
+```{r}
+library(ISLR)
+
+Hitters <- na.omit(Hitters)
+sum(is.na(Hitters))
+
+library(leaps)
+regfit.full <- regsubsets(Salary ~., Hitters, nvmax = 10)
+summary(regfit.full)
+
+reg.summary <- summary(regfit.full)
+reg.summary$rsq
+
+par(mfrow=c(2,2))
+plot(reg.summary$rss, xlab = "Nvar", ylab = "RSS", type = "l")
+plot(reg.summary$adjr2, xlab = "Nvar", ylab = "Adj RSq", type = "l")
+which.max(reg.summary$adjr2)
+points(10, reg.summary$adjr2[10], col="red", cex = 2, pch=20)
+
+plot(regfit.full, scale = "r2")
+plot(regfit.full, scale = "adjr2")
+plot(regfit.full, scale = "Cp")
+plot(regfit.full, scale = "bic")
+
+regfit.fwd <- regsubsets(Salary~., data = Hitters, nvmax = 19, method = "forward")
+summary(regfit.fwd)
+regfit.bwd <- regsubsets(Salary~., data = Hitters, nvmax = 19, method = "backward")
+summary(regfit.bwd)
+```
+

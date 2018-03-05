@@ -1,0 +1,50 @@
+---
+title: 'Chapter 4: Classification'
+pdf_document: default
+output:
+  html_notebook:
+    pandoc_args:
+    - --number-sections
+    - --number-offset=4
+    toc: yes
+  html_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+
+# Labs
+
+```{r}
+library(ISLR)
+#names(Smarket)
+#dim(Smarket)
+#summary(Smarket)
+#cor(Smarket[,-9])
+attach(Smarket)
+plot(Volume)
+
+#logistic regression
+##predict direction of the market based on lagged values
+glm.fit <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, family = binomial, data = Smarket)
+summary(glm.fit)
+
+glm.probs <- predict(glm.fit, type = "response")
+contrasts(Direction) #to see what P(Y=1|X) means; Up = 1, so prob is for Up direction
+
+glm.pred <- rep("Down", 1250)
+glm.pred[glm.probs > .5] = "Up"
+
+table(glm.pred, Smarket$Direction)
+mean(glm.pred==Smarket$Direction)
+```
+
+Linear Discriminant Analysis
+
+
+K-Nearest Neighbors
+```{r}
+
+```
+
