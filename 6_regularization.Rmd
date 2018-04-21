@@ -13,36 +13,104 @@ output:
     toc: yes
 ---
 
+# Overview
+
+Problem: high dimensionality
+
+## Subset Selection
+variations
+pros, cons
+
+## Shrinkage Methods
+
+## Dimension Reduction
+
 # Lab
 
-Best Subset Selection
-```{r}
+## Best Subset Selection
+
+### Original
+
+```{r, message=FALSE}
 library(ISLR)
 
-Hitters <- na.omit(Hitters)
-sum(is.na(Hitters))
+Hitters <- na.omit(Hitters) # remove na values
+sum(is.na(Hitters)) # check that na values are removed
 
+# use leaps to find best subset selection by r2
 library(leaps)
 regfit.full <- regsubsets(Salary ~., Hitters, nvmax = 10)
 summary(regfit.full)
+```
 
-reg.summary <- summary(regfit.full)
-reg.summary$rsq
+```{r}
+reg.summary <- summary(regfit.full) #summarize models
+reg.summary$rsq #see the r2s
+```
 
-par(mfrow=c(2,2))
+Plot the the change in RSS and Rsq as the number of variables increase
+
+```{r, message=FALSE}
+par(mfrow=c(1,2))
 plot(reg.summary$rss, xlab = "Nvar", ylab = "RSS", type = "l")
 plot(reg.summary$adjr2, xlab = "Nvar", ylab = "Adj RSq", type = "l")
-which.max(reg.summary$adjr2)
-points(10, reg.summary$adjr2[10], col="red", cex = 2, pch=20)
+best_model <- which.max(reg.summary$adjr2)
+points(10, reg.summary$adjr2[best_model], col="red", cex = 2, pch=20)
+```
 
+Look at the variables selecgted for the best model under different criteria.
+
+```{r}
+par(mfrow=c(1,2))
 plot(regfit.full, scale = "r2")
 plot(regfit.full, scale = "adjr2")
 plot(regfit.full, scale = "Cp")
 plot(regfit.full, scale = "bic")
+```
 
+Look at the coefficients for the sixth model
+
+```{r}
+coef(regfit.full ,6)
+```
+
+
+```{r, message=FALSE}
+#forward subsetselection
 regfit.fwd <- regsubsets(Salary~., data = Hitters, nvmax = 19, method = "forward")
-summary(regfit.fwd)
+#summary(regfit.fwd)
+
+#backward subsetselection
 regfit.bwd <- regsubsets(Salary~., data = Hitters, nvmax = 19, method = "backward")
-summary(regfit.bwd)
+#summary(regfit.bwd)
+```
+
+### Better
+
+https://gist.github.com/dkahle/7942a7eba8aaa026d0bab6a1e9d88580
+
+https://cran.r-project.org/web/packages/dotwhisker/vignettes/dotwhisker-vignette.html
+
+
+```{r}
+library(dotwhisker)
+
+x <- broom::tidy(regfit.full)
+
+dwplot(regfit.full)
+
+m1 <- lm(mpg ~ wt + cyl + disp + gear, data = mtcars)
+dwplot(m1)
+```
+
+
+## Choosing the Best Model
+
+### Original
+
+```{r}
+set.seed(1)
+train <- sample(c(TRUE, FALSE), nrow(Hitters), rep = TRUE)
+test <- (!train)
 ```
 
